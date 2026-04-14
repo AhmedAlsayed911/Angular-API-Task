@@ -1,0 +1,43 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/students">Madrasty</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        @if (authService.isLoggedIn() && authService.isAdminOrInstructor()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/students" routerLinkActive="active">Students</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/courses" routerLinkActive="active">Courses</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/departments" routerLinkActive="active">Departments</a>
+          </li>
+        }
+
+        @if (authService.isLoggedIn() && authService.hasRole('Student')) {
+        }
+      </ul>
+
+      <div class="d-flex gap-2">
+        @if (!authService.isLoggedIn()) {
+          <a class="btn btn-outline-primary" routerLink="/login">Login</a>
+          <a class="btn btn-primary" routerLink="/register">Register</a>
+        } @else {
+          <button class="btn btn-outline-danger" (click)="logout()">Logout</button>
+        }
+      </div>
+    </div>
+  </div>
+</nav>

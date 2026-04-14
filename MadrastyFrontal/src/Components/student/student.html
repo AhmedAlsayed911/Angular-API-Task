@@ -1,0 +1,174 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Students</h2>
+
+  @if (errorMessage()) {
+    <div class="alert alert-warning">{{ errorMessage() }}</div>
+  }
+
+  @if (isPrivilegedUser()) {
+    <form class="row g-2 mb-3" (ngSubmit)="submit()">
+      <div class="col-md-3">
+        <input class="form-control" placeholder="Name" [(ngModel)]="studentModel.name" name="name" required />
+      </div>
+      <div class="col-md-3">
+        <input class="form-control" placeholder="Address" [(ngModel)]="studentModel.address" name="address" required />
+      </div>
+      <div class="col-md-2">
+        <input type="number" class="form-control" placeholder="Age" [(ngModel)]="studentModel.age" name="age" min="1" max="60" required />
+      </div>
+      <div class="col-md-2">
+        <select class="form-select" [(ngModel)]="studentModel.departmentId" name="departmentId" required>
+          @for (department of departments(); track department.id) {
+            <option [ngValue]="department.id">{{ department.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update' : 'Add' }}</button>
+        <button class="btn btn-outline-secondary" type="button" (click)="resetForm()">Reset</button>
+      </div>
+    </form>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Address</th>
+          <th>Age</th>
+          <th>Department Name</th>
+          <th>Grades</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of Students(); track item.id) {
+          <tr>
+            <th scope="row">{{ item.id }}</th>
+            <td>{{ item.fullName }}</td>
+            <td>{{ item.address }}</td>
+            <td>{{ item.age }}</td>
+            <td>{{ item.departmentName }}</td>
+            <td>
+              <a class="btn btn-sm btn-outline-primary" [routerLink]="['/students', item.id, 'grades']">View Grades</a>
+            </td>
+            <td class="d-flex flex-wrap gap-2">
+              <button class="btn btn-sm btn-outline-info" type="button" (click)="openAssignCourseModal(item)">Assign Course</button>
+              <button class="btn btn-sm btn-outline-success" type="button" (click)="openAssignGradeModal(item)">Assign Grade</button>
+              <button class="btn btn-sm btn-warning" type="button" (click)="edit(item)">Edit</button>
+              <button class="btn btn-sm btn-danger" type="button" (click)="delete(item.id)">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (isAssignGradeModalOpen()) {
+      <div class="grade-modal-backdrop" (click)="closeAssignGradeModal()"></div>
+      <div class="grade-modal card shadow" role="dialog" aria-modal="true" aria-label="Assign grade modal">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Assign Grade - {{ selectedStudentName() }}</h5>
+            <button type="button" class="btn-close" aria-label="Close" (click)="closeAssignGradeModal()"></button>
+          </div>
+
+          <form class="row g-2" (ngSubmit)="submitGrade()">
+            <div class="col-12">
+              <label for="courseId" class="form-label">Course</label>
+              <select
+                id="courseId"
+                class="form-select"
+                name="courseId"
+                [(ngModel)]="gradeModel.courseId"
+                required
+              >
+                @if (!selectedStudentCourses().length) {
+                  <option [ngValue]="0">No courses found for this student</option>
+                }
+                @for (course of selectedStudentCourses(); track course.courseId) {
+                  <option [ngValue]="course.courseId">{{ course.courseName }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="grade" class="form-label">Grade</label>
+              <input
+                id="grade"
+                type="number"
+                class="form-control"
+                placeholder="Grade (1-100)"
+                [(ngModel)]="gradeModel.grade"
+                name="grade"
+                min="1"
+                max="100"
+                required
+              />
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+              <button type="button" class="btn btn-outline-secondary" (click)="closeAssignGradeModal()">Cancel</button>
+              <button type="submit" class="btn btn-success" [disabled]="!selectedStudentCourses().length">Save Grade</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    @if (isAssignCourseModalOpen()) {
+      <div class="grade-modal-backdrop" (click)="closeAssignCourseModal()"></div>
+      <div class="grade-modal card shadow" role="dialog" aria-modal="true" aria-label="Assign course modal">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Assign Course</h5>
+            <button type="button" class="btn-close" aria-label="Close" (click)="closeAssignCourseModal()"></button>
+          </div>
+
+          <form class="row g-2" (ngSubmit)="submitCourseAssignment()">
+            <div class="col-12">
+              <label for="studentId" class="form-label">Student Id</label>
+              <input
+                id="studentId"
+                type="number"
+                class="form-control"
+                name="studentId"
+                [(ngModel)]="courseAssignmentModel.studentId"
+                min="1"
+                required
+              />
+            </div>
+
+            <div class="col-12">
+              <label for="assignCourseId" class="form-label">Course</label>
+              <select
+                id="assignCourseId"
+                class="form-select"
+                name="assignCourseId"
+                [(ngModel)]="courseAssignmentModel.courseId"
+                required
+              >
+                @for (course of courses(); track course.id) {
+                  <option [ngValue]="course.id">{{ course.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+              <button type="button" class="btn btn-outline-secondary" (click)="closeAssignCourseModal()">Cancel</button>
+              <button type="submit" class="btn btn-info">Assign Course</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="card">
+      <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <h5 class="card-title mb-1">Student Access</h5>
+          <p class="card-text mb-0">Admin actions are hidden for your account.</p>
+        </div>
+      </div>
+    </div>
+  }
+</div>

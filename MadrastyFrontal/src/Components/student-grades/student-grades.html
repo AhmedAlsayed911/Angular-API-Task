@@ -1,0 +1,43 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Student Grades</h2>
+    <a class="btn btn-outline-secondary" routerLink="/students">Back to Students</a>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-warning">{{ errorMessage() }}</div>
+  }
+
+  @if (student(); as currentStudent) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ currentStudent.fullName }}</h5>
+        <p class="card-text mb-1"><strong>Department:</strong> {{ currentStudent.departmentName }}</p>
+        <p class="card-text mb-0"><strong>Address:</strong> {{ currentStudent.address }}</p>
+      </div>
+    </div>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Course</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (currentStudent.grades.length) {
+          @for (grade of currentStudent.grades; track grade.courseId) {
+            <tr>
+              <td>{{ grade.courseName }}</td>
+              <td>{{ grade.grade }}</td>
+            </tr>
+          }
+        } @else {
+          <tr>
+            <td colspan="2" class="text-muted">No grades found for this student.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

@@ -1,0 +1,53 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Courses</h2>
+
+  @if (errorMessage()) {
+    <div class="alert alert-warning">{{ errorMessage() }}</div>
+  }
+
+  <form class="row g-2 mb-3" (ngSubmit)="submit()">
+    <div class="col-md-4">
+      <input class="form-control" placeholder="Name" [(ngModel)]="courseModel.name" name="name" required />
+    </div>
+    <div class="col-md-2">
+      <input type="number" class="form-control" placeholder="Duration" [(ngModel)]="courseModel.duration" name="duration" min="1" max="3" required />
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" [(ngModel)]="courseModel.topicId" name="topicId" required>
+        @for (topic of topics(); track topic.id) {
+          <option [ngValue]="topic.id">{{ topic.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-4 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update' : 'Add' }}</button>
+      <button class="btn btn-outline-secondary" type="button" (click)="resetForm()">Reset</button>
+    </div>
+  </form>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Duration</th>
+        <th>Topic</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of courses(); track item.id) {
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.duration }}</td>
+          <td>{{ item.topicName }}</td>
+          <td class="d-flex gap-2">
+            <button class="btn btn-sm btn-warning" (click)="edit(item)">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="delete(item.id)">Delete</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

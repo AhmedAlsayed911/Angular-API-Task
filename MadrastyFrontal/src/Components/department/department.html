@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Departments</h2>
+
+  @if (errorMessage()) {
+    <div class="alert alert-warning">{{ errorMessage() }}</div>
+  }
+
+  <form class="row g-2 mb-3" (ngSubmit)="submit()">
+    <div class="col-md-4">
+      <input class="form-control" placeholder="Name" [(ngModel)]="departmentModel.name" name="name" required />
+    </div>
+    <div class="col-md-4">
+      <input class="form-control" placeholder="Location" [(ngModel)]="departmentModel.location" name="location" required />
+    </div>
+    <div class="col-md-4 d-flex gap-2">
+      <button class="btn btn-primary" type="submit">{{ isEditMode ? 'Update' : 'Add' }}</button>
+      <button class="btn btn-outline-secondary" type="button" (click)="resetForm()">Reset</button>
+    </div>
+  </form>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of departments(); track item.id) {
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.location }}</td>
+          <td class="d-flex gap-2">
+            <a class="btn btn-sm btn-info" [routerLink]="['/departments', item.id]">Details</a>
+            <button class="btn btn-sm btn-warning" (click)="edit(item)">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="delete(item.id)">Delete</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
